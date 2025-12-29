@@ -27,7 +27,7 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy go-hello \
+          gcloud run deploy go-hello-auth \
             --source . \
             --region ${{ secrets.GCP_REGION }} \
             --project ${{ secrets.GCP_PROJECT_ID }} \
