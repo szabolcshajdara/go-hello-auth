@@ -33,7 +33,7 @@ jobs:
           BUILD_PROJECT: ${{ secrets.GCP_PROJECT }}
         run: |
           gcloud run deploy $BUILD_PROJECT \
-            --source . \
+            --source gcp-run-go \
             --region ${{ secrets.GCP_REGION }} \
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --allow-unauthenticated=false
