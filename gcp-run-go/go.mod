@@ -1,3 +1,3 @@
-module cloudrun-go
+module gohello.eu/main
 
-go 1.22
+go 1.25
