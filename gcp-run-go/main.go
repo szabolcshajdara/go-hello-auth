@@ -1,8 +1,9 @@
-package main
+package goauth
 
 import (
 	"fmt"
 	"net/http"
+
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 )
 
@@ -11,17 +12,17 @@ func init() {
 }
 
 func helloAuth(w http.ResponseWriter, r *http.Request) {
-	// 1. Mandatory CORS headers for the Static Site
-	w.Header().Set("Access-Control-Allow-Origin", "https://YOUR_BUCKET_NAME.storage.googleapis.com")
+	// 1. Set CORS headers
+	w.Header().Set("Access-Control-Allow-Origin", "https://storage.googleapis.com") // Or "*"
 	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
-	// 2. Handle Browser Preflight
-	if r.Method == "OPTIONS" {
+	// 2. Handle Preflight
+	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	// 3. Logic (Only reached if IAM allows the user)
-	fmt.Fprint(w, "Hello World! You have successfully authenticated via IAM.")
+	// 3. Logic
+	fmt.Fprint(w, "Hello, World!")
 }

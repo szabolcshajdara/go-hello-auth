@@ -1,0 +1,33 @@
+swagger: '2.0'
+info:
+  title: Go Hello World Secure Gateway
+  version: 1.0.0
+schemes:
+  - https
+paths:
+  /hello:
+    get:
+      operationId: hello
+      x-google-backend:
+        address: https://europe-west1-go-hello-auth-482914.cloudfunctions.net/go-hello-auth
+      security:
+        - google_id_token: []
+      responses:
+        '200':
+          description: Success
+    options:
+      operationId: corsHello
+      x-google-backend:
+        address: https://europe-west1-go-hello-auth-482914.cloudfunctions.net/go-hello-auth
+      security: [] # MUST be empty for CORS preflight
+      responses:
+        '204':
+          description: No Content
+securityDefinitions:
+  google_id_token:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "https://accounts.google.com"
+    x-google-jwks_uri: "https://www.googleapis.com/oauth2/v3/certs"
+    x-google-audiences: "95844004012-pp09s2grai11kqk4t6g7b1515uprn40o.apps.googleusercontent.com"

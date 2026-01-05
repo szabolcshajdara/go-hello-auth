@@ -1,52 +1,76 @@
 <!DOCTYPE html>
-<html>
-<body>
-    <h1>Cloud Function Auth Demo</h1>
-    <button onclick="getToken()">1. Login & Authorize</button>
-    <button onclick="callFunction()">2. Call Secure Function</button>
-    
-    <p id="status">Status: Not logged in</p>
-    <pre id="output"></pre>
-
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Hello Auth - ID Token</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <h1>API Gateway + Go Cloud Function</h1>
+    <p>Authenticate with Google to call the private backend.</p>
+
+    <div id="g_id_onload"
+         data-client_id="95844004012-pp09s2grai11kqk4t6g7b1515uprn40o.apps.googleusercontent.com"
+         data-context="signin"
+         data-ux_mode="popup"
+         data-callback="handleCredentialResponse"
+         data-auto_select="true"
+         data-auto_prompt="true">
+    </div>
+
+    <div class="g_id_signin"
+         data-type="standard"
+         data-shape="rectangular"
+         data-theme="outline"
+         data-text="signin_with"
+         data-size="large"
+         data-logo_alignment="left">
+    </div>
+
+    <hr>
+    <button id="callApiBtn" style="display:none;" onclick="callApi()">Call API Gateway</button>
+    <div id="responseArea" style="margin-top: 20px; font-family: monospace; white-space: pre-wrap;"></div>
+
     <script>
-        let client;
-        let access_token;
+        let savedIdToken = "";
 
-        // Initialize the Identity client
-        window.onload = function () {
-            client = google.accounts.oauth2.initTokenClient({
-                client_id: 'YOUR_CLIENT_ID.apps.googleusercontent.com',
-                scope: 'openid email profile', // Scopes needed to identify the user
-                callback: (tokenResponse) => {
-                    access_token = tokenResponse.access_token;
-                    document.getElementById('status').innerText = "Status: Authenticated!";
-                },
-            });
-        };
-
-        function getToken() {
-            client.requestAccessToken();
+        // This function runs after a successful Google login
+        function handleCredentialResponse(response) {
+            console.log("ID Token received");
+            savedIdToken = response.credential;
+            
+            // Show the call button now that we have a token
+            document.getElementById("callApiBtn").style.display = "block";
+            document.getElementById("responseArea").innerText = "Successfully logged in. Click the button to call the API.";
         }
 
-        async function callFunction() {
-            if (!access_token) {
-                alert("Please login first!");
-                return;
-            }
+        async function callApi() {
+            const gatewayUrl = "https://go-hello-auth-gateway-18131mss.ew.gateway.dev/hello";
+            const responseArea = document.getElementById("responseArea");
+
+            responseArea.innerText = "Calling API...";
 
             try {
-                const response = await fetch('https://YOUR_FUNCTION_URL.run.app', {
+                const res = await fetch(gatewayUrl, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${access_token}`
+                        'Authorization': `Bearer ${savedIdToken}`,
+                        'Content-Type': 'application/json'
                     }
                 });
-                
-                const text = await response.text();
-                document.getElementById('output').innerText = text;
+
+                if (!res.ok) {
+                    const errorText = await res.text();
+                    responseArea.innerText = `Error ${res.status}: ${errorText}`;
+                    return;
+                }
+
+                const data = await res.text();
+                responseArea.innerText = `Success! Response from Go:\n${data}`;
             } catch (err) {
-                document.getElementById('output').innerText = "Error: " + err;
+                console.error("Fetch error:", err);
+                responseArea.innerText = "Fetch failed. Check the browser console for CORS or Network errors.";
             }
         }
     </script>
