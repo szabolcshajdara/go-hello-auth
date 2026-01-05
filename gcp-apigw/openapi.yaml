@@ -10,6 +10,7 @@ paths:
       operationId: hello
       x-google-backend:
         address: https://europe-west1-go-hello-auth-482914.cloudfunctions.net/go-hello-auth
+        disable_auth: true # This tells the gateway to pass the user's identity through
       security:
         - google_id_token: []
       responses:

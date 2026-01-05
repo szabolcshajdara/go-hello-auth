@@ -54,11 +54,13 @@ func helloAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	/* Use only if user identity is checked by the function itself
 	// 3.4. Check the Allow List
 	if !allowedUsers[userInfo.Email] {
 		http.Error(w, fmt.Sprintf("Forbidden: User %s is not allowed", userInfo.Email), http.StatusForbidden)
 		return
 	}
+	*/
 
 	// 4. Logic
 	fmt.Fprint(w, "Hello, World from "+userInfo.Email+"!")
