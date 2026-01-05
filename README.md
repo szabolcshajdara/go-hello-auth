@@ -25,10 +25,9 @@ The solution can be deployed manually with the following steps.
     --region europe-west1 \  
     --member "serviceAccount:api-gw-backend-sa@go-hello-auth-482914.iam.gserviceaccount.com" \  
     --role "roles/cloudfunctions.invoker"
-  - gcloud functions add-iam-policy-binding go-hello-auth \  
+  - gcloud functions add-invoker-policy-binding go-hello-auth \  
    --region europe-west1 \  
-   --member "serviceAccount:api-gw-backend-sa@go-hello-auth-482914.iam.gserviceaccount.com" \  
-   --role "roles/run.invoker"
+   --member "serviceAccount:api-gw-backend-sa@go-hello-auth-482914.iam.gserviceaccount.com"
   - gcloud api-gateway api-configs create go-hello-auth-api-config \  
     --api=go-hello-auth-api \  
     --openapi-spec=gcp-apigw/openapi.yaml \  
@@ -73,18 +72,16 @@ The solution can be deployed manually with the following steps.
         --region europe-west1 \  
         --member "serviceAccount:api-gw-backend-sa@go-hello-auth-482914.iam.gserviceaccount.com" \  
         --role "roles/cloudfunctions.invoker"
-      - gcloud functions remove-iam-policy-binding go-hello-auth \  
+      - gcloud functions remove-invoker-policy-binding go-hello-auth \  
         --region europe-west1 \  
-        --member "serviceAccount:api-gw-backend-sa@go-hello-auth-482914.iam.gserviceaccount.com" \  
-        --role "roles/run.invoker"
+        --member "serviceAccount:api-gw-backend-sa@go-hello-auth-482914.iam.gserviceaccount.com"
     - Add rights to dedicated users to call the function:
       - gcloud functions add-iam-policy-binding go-hello-auth \  
         --region europe-west1 \  
         --member "user1@gmail.com" \  
         --role "roles/cloudfunctions.invoker"
-      - gcloud functions add-iam-policy-binding go-hello-auth \  
+      - gcloud functions add-invoker-policy-binding go-hello-auth \  
         --region europe-west1 \  
-        --member "user1@gmail.com" \  
-        --role "roles/run.invoker"
+        --member "user1@gmail.com"
             
   
