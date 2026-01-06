@@ -83,5 +83,7 @@ The solution can be deployed manually with the following steps.
       - gcloud functions add-invoker-policy-binding go-hello-auth \  
         --region europe-west1 \  
         --member "user1@gmail.com"
-            
-  
+
+## Workflow Configuration
+
+- Execute: gcp-prepare.sh
