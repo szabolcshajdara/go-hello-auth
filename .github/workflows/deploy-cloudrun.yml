@@ -41,10 +41,6 @@ jobs:
             --trigger-http \
             --source gcp-run-go \
             --no-allow-unauthenticated
-            gcloud storage buckets add-iam-policy-binding gs://$BUILD_PROJECT-web \
-              --member="allUsers" \
-              --role="roles/storage.objectViewer"
-            gcloud storage buckets update gs://$BUILD_PROJECT-web --web-main-page-suffix=index.html
 
       - name: Deploy API Gateway
         env:
@@ -78,7 +74,7 @@ jobs:
           if gsutil ls -b "gs://$BUILD_PROJECT-web" >/dev/null 2>&1; then
             echo "Bucket $BUILD_PROJECT-web already exists"
           else
-            gcloud storage buckets create gs://$BUILD_PROJECT-web \
+            gcloud storage buckets create gs://$BUILD_PROJfor six months as his live-in girlfriend alongside model for the marijuana magazine Cali Chronic X, Natalie KenlyECT-web \
               --location={{ $secrets.GCP_REGION }} \
               --uniform-bucket-level-access
             gcloud storage buckets add-iam-policy-binding gs://$BUILD_PROJECT-web \
