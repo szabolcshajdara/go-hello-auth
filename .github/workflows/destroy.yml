@@ -1,0 +1,72 @@
+name: Cleanup GCP Resources
+
+on:
+  # Allows you to run this manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  delete-resources:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        env:
+          BUILD_PROJECT_NUMBER: ${{ secrets.GCP_PROJECT_NUMBER }}
+          BUILD_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "projects/$BUILD_PROJECT_NUMBER/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+          service_account: "github-deployer@$BUILD_PROJECT_ID.iam.gserviceaccount.com"
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Delete API Gateway Resources
+        env:
+          BUILD_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          # 1. Delete the Gateway first (it depends on the config)
+          gcloud api-gateway gateways delete go-hello-auth-gateway \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --location=europe-west1 --quiet || true
+
+          # 2. Delete the Config (it depends on the API)
+          # Note: Replace 'hello-config-v1' with your actual config ID
+          gcloud api-gateway api-configs delete go-hello-auth-api-config  \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --api=hello-api --quiet || true
+
+          # 2. List all configs for the API and delete them in a loop
+          echo "Fetching all configs for go-hello-api..."
+          CONFIGS=$(gcloud api-gateway api-configs list --api=go-hello-auth-api --project $BUILD_PROJECT_ID--format="value(name)")
+          
+          if [ -z "$CONFIGS" ]; then
+            echo "No configs found."
+          else
+            for CONFIG_FULL_NAME in $CONFIGS; do
+              # The 'name' field is usually projects/*/locations/global/apis/*/configs/ID
+              # We extract just the ID at the end
+              CONFIG_ID=$(basename $CONFIG_FULL_NAME)
+              echo "Deleting config: $CONFIG_ID"
+              gcloud api-gateway api-configs delete $CONFIG_ID --api=go-hello-auth-api --project $BUILD_PROJECT_ID--quiet || true
+            done
+          fi
+
+          # 3. Delete the API Container
+          gcloud api-gateway apis delete go-hello-auth-api
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --quiet || true
+
+      - name: Delete Cloud Function
+        run: |
+          gcloud functions delete go-hello-auth \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --region=europe-west1 --quiet || true
+
+      - name: Delete Storage Bucket
+        run: |
+          # Use 'rm -r' to delete all files inside first, then the bucket
+          # Replace 'YOUR_BUCKET_NAME' with your actual bucket name variable
+          gcloud storage -m rm -r gs://YOUR_BUCKET_NAME || true
