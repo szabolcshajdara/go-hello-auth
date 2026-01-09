@@ -17,13 +17,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
-        #env:
-        #  BUILD_PROJECT_NUMBER: ${{ secrets.GCP_PROJECT_NUMBER }}
-        #  BUILD_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         uses: google-github-actions/auth@v2
         with:
-          # workload_identity_provider: "projects/$BUILD_PROJECT_NUMBER/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
-          # service_account: "github-deployer@$BUILD_PROJECT_ID.iam.gserviceaccount.com"
           workload_identity_provider: "projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
           service_account: "github-deployer@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com"
 
@@ -47,7 +42,7 @@ jobs:
 
           # 2. List all configs for the API and delete them in a loop
           echo "Fetching all configs for go-hello-api..."
-          CONFIGS=$(gcloud api-gateway api-configs list --api=go-hello-auth-api --project $BUILD_PROJECT_ID --format="value(name)")
+          CONFIGS=$(gcloud api-gateway api-configs list --api=go-hello-auth-api --project=${{ secrets.GCP_PROJECT_ID }} --format="value(name)")
           
           if [ -z "$CONFIGS" ]; then
             echo "No configs found."
@@ -57,12 +52,12 @@ jobs:
               # We extract just the ID at the end
               CONFIG_ID=$(basename $CONFIG_FULL_NAME)
               echo "Deleting config: $CONFIG_ID"
-              gcloud api-gateway api-configs delete $CONFIG_ID --api=go-hello-auth-api --project $BUILD_PROJECT_ID--quiet || true
+              gcloud api-gateway api-configs delete $CONFIG_ID --api=go-hello-auth-api --project=${{ secrets.GCP_PROJECT_ID }}--quiet || true
             done
           fi
 
           # 3. Delete the API Container
-          gcloud api-gateway apis delete go-hello-auth-api
+          gcloud api-gateway apis delete go-hello-auth-api \
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --quiet || true
 
