@@ -3,6 +3,7 @@
 SH_PROJECT=go-hello-auth
 SH_PROJECT_ID=go-hello-auth-482914
 SH_PROJECT_NUMBER=95844004012
+SH_GITHUB_REPO=szabolcshajdara/go-hello-auth
 
 gcloud config set project $SH_PROJECT_ID
 gcloud services enable compute.googleapis.com
@@ -22,7 +23,7 @@ gcloud iam workload-identity-pools providers create-oidc github-provider \
   --display-name="GitHub Provider" \
   --issuer-uri="https://token.actions.githubusercontent.com" \
   --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository,attribute.ref=assertion.ref" \
-  --attribute-condition="attribute.repository == 'OWNER/REPO'"
+  --attribute-condition="attribute.repository == '$SH_GITHUB_REPO'"
 
 gcloud iam service-accounts create github-deployer \
   --project=$SH_PROJECT_ID \
