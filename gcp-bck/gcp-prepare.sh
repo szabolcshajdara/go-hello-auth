@@ -2,7 +2,7 @@
 
 SH_PROJECT=go-hello-auth
 SH_PROJECT_ID=go-hello-auth-482914
-SH_RPOJECT_NUMBER=95844004012
+SH_PROJECT_NUMBER=95844004012
 
 gcloud config set project $SH_PROJECT_ID
 gcloud services enable compute.googleapis.com
@@ -46,8 +46,8 @@ gcloud projects add-iam-policy-binding $SH_PROJECT_ID \
   --member="serviceAccount:github-deployer@$SH_PROJECT_ID.iam.gserviceaccount.com" \
   --role="roles/run.admin"
 
-gcloud projects add-iam-policy-binding $SH_PROJECT_ID
---member="serviceAccount:github-deployer@$SH_PROJECT_ID.iam.gserviceaccount.com"
+gcloud projects add-iam-policy-binding $SH_PROJECT_ID \
+--member="serviceAccount:github-deployer@$SH_PROJECT_ID.iam.gserviceaccount.com" \
 --role="roles/iam.securityAdmin"
 
 gcloud projects add-iam-policy-binding $SH_PROJECT_ID \
