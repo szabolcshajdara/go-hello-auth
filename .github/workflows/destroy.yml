@@ -47,7 +47,7 @@ jobs:
 
           # 2. List all configs for the API and delete them in a loop
           echo "Fetching all configs for go-hello-api..."
-          CONFIGS=$(gcloud api-gateway api-configs list --api=go-hello-auth-api --project $BUILD_PROJECT_ID--format="value(name)")
+          CONFIGS=$(gcloud api-gateway api-configs list --api=go-hello-auth-api --project $BUILD_PROJECT_ID --format="value(name)")
           
           if [ -z "$CONFIGS" ]; then
             echo "No configs found."

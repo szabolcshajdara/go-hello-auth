@@ -70,3 +70,11 @@ gcloud projects add-iam-policy-binding $SH_PROJECT_ID \
 gcloud projects add-iam-policy-binding $SH_PROJECT_ID \
   --member="serviceAccount:github-deployer@$SH_PROJECT_ID.iam.gserviceaccount.com" \
   --role="roles/iam.serviceAccountUser"
+
+gcloud projects add-iam-policy-binding $SH_PROJECT_ID \
+  --member="serviceAccount:github-deployer@$SH_PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/apigateway.admin"
+
+gcloud projects add-iam-policy-binding $SH_PROJECT_ID \
+  --member="serviceAccount:github-deployer@$SH_PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/cloudfunctions.admin"
