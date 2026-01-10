@@ -51,8 +51,7 @@ jobs:
             echo "API Gateway already exists: $BUILD_PROJECT-gateway"
           else
             gcloud api-gateway apis create $BUILD_PROJECT-api \
-              --project=${{ secrets.GCP_PROJECT_ID }} \
-              --location=${{ secrets.GCP_REGION }}
+              --project=${{ secrets.GCP_PROJECT_ID }}
 
             gcloud api-gateway api-configs create $BUILD_PROJECT-api-config \
               --api=$BUILD_PROJECT-api \
