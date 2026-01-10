@@ -1,7 +1,7 @@
 name: Cleanup GCP Resources
 
 on:
-  # Allows you to run this manually from the Actions tab
+  # Allows to run this manually from the Actions tab
   workflow_dispatch:
 
 jobs:
