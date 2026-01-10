@@ -53,7 +53,7 @@ jobs:
 
           # 3. Delete the API Container
           gcloud api-gateway apis delete go-hello-auth-api \
-            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
             --quiet || true
 
       - name: Delete Cloud Function
