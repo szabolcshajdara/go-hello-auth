@@ -16,72 +16,72 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      # - name: Checkout
+      #   uses: actions/checkout@v4
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: "projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
-          service_account: "github-deployer@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com"
+      # - name: Authenticate to Google Cloud
+      #   uses: google-github-actions/auth@v2
+      #   with:
+      #     workload_identity_provider: "projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+      #     service_account: "github-deployer@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com"
 
-      - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v2
+      # - name: Setup gcloud
+      #   uses: google-github-actions/setup-gcloud@v2
 
-      - name: Deploy to Cloud Function
-        run: |
-          gcloud functions deploy ${{ secrets.GCP_PROJECT }} \
-            --gen2 \
-            --runtime go125 \
-            --region ${{ secrets.GCP_REGION }} \
-            --project ${{ secrets.GCP_PROJECT_ID }} \
-            --entry-point HelloAuth \
-            --trigger-http \
-            --source gcp-run-go \
-            --no-allow-unauthenticated
+      # - name: Deploy to Cloud Function
+      #   run: |
+      #     gcloud functions deploy ${{ secrets.GCP_PROJECT }} \
+      #       --gen2 \
+      #       --runtime go125 \
+      #       --region ${{ secrets.GCP_REGION }} \
+      #       --project ${{ secrets.GCP_PROJECT_ID }} \
+      #       --entry-point HelloAuth \
+      #       --trigger-http \
+      #       --source gcp-run-go \
+      #       --no-allow-unauthenticated
 
-      - name: Deploy API Gateway
-        env:
-          BUILD_PROJECT: ${{ secrets.GCP_PROJECT }}
-        run: |
-          if gcloud api-gateway gateways describe "$BUILD_PROJECT-gateway" \
-               --project=${{ secrets.GCP_PROJECT_ID }} \
-               --location=${{ secrets.GCP_REGION }} \
-               --format="value(name)" >/dev/null 2>&1; then
-            echo "API Gateway already exists: $BUILD_PROJECT-gateway"
-          else
-            gcloud api-gateway apis create $BUILD_PROJECT-api \
-              --project=${{ secrets.GCP_PROJECT_ID }}
+      # - name: Deploy API Gateway
+      #   env:
+      #     BUILD_PROJECT: ${{ secrets.GCP_PROJECT }}
+      #   run: |
+      #     if gcloud api-gateway gateways describe "$BUILD_PROJECT-gateway" \
+      #          --project=${{ secrets.GCP_PROJECT_ID }} \
+      #          --location=${{ secrets.GCP_REGION }} \
+      #          --format="value(name)" >/dev/null 2>&1; then
+      #       echo "API Gateway already exists: $BUILD_PROJECT-gateway"
+      #     else
+      #       gcloud api-gateway apis create $BUILD_PROJECT-api \
+      #         --project=${{ secrets.GCP_PROJECT_ID }}
 
-            gcloud api-gateway api-configs create $BUILD_PROJECT-api-config \
-              --api=$BUILD_PROJECT-api \
-              --openapi-spec=gcp-apigw/openapi.yaml \
-              --project=${{ secrets.GCP_PROJECT_ID }}
+      #       gcloud api-gateway api-configs create $BUILD_PROJECT-api-config \
+      #         --api=$BUILD_PROJECT-api \
+      #         --openapi-spec=gcp-apigw/openapi.yaml \
+      #         --project=${{ secrets.GCP_PROJECT_ID }}
 
-            gcloud api-gateway gateways create $BUILD_PROJECT-gateway \
-              --api=$BUILD_PROJECT-api \
-              --api-config=$BUILD_PROJECT-api-config \
-              --location=${{ secrets.GCP_REGION }} \
-              --project=${{ secrets.GCP_PROJECT_ID }}
-          fi
+      #       gcloud api-gateway gateways create $BUILD_PROJECT-gateway \
+      #         --api=$BUILD_PROJECT-api \
+      #         --api-config=$BUILD_PROJECT-api-config \
+      #         --location=${{ secrets.GCP_REGION }} \
+      #         --project=${{ secrets.GCP_PROJECT_ID }}
+      #     fi
 
-      - name: Deploy Static Website
-        env:
-          BUILD_PROJECT: ${{ secrets.GCP_PROJECT }}
-        run: |
-          if gsutil ls -b "gs://$BUILD_PROJECT-web" >/dev/null 2>&1; then
-            echo "Bucket $BUILD_PROJECT-web already exists"
-          else
-            gcloud storage buckets create gs://$BUILD_PROJECT-web \
-              --location=${{ secrets.GCP_REGION }} \
-              --project ${{ secrets.GCP_PROJECT_ID }} \
-              --uniform-bucket-level-access
-            gcloud storage buckets add-iam-policy-binding gs://$BUILD_PROJECT-web \
-              --member="allUsers" \
-              --role="roles/storage.objectViewer"
-            gcloud storage buckets update gs://$BUILD_PROJECT-web --web-main-page-suffix=index.html
-          fi
-          gcloud storage cp gcp-bck/index.html gs://$BUILD_PROJECT-web/
+      # - name: Deploy Static Website
+      #   env:
+      #     BUILD_PROJECT: ${{ secrets.GCP_PROJECT }}
+      #   run: |
+      #     if gsutil ls -b "gs://$BUILD_PROJECT-web" >/dev/null 2>&1; then
+      #       echo "Bucket $BUILD_PROJECT-web already exists"
+      #     else
+      #       gcloud storage buckets create gs://$BUILD_PROJECT-web \
+      #         --location=${{ secrets.GCP_REGION }} \
+      #         --project ${{ secrets.GCP_PROJECT_ID }} \
+      #         --uniform-bucket-level-access
+      #       gcloud storage buckets add-iam-policy-binding gs://$BUILD_PROJECT-web \
+      #         --member="allUsers" \
+      #         --role="roles/storage.objectViewer"
+      #       gcloud storage buckets update gs://$BUILD_PROJECT-web --web-main-page-suffix=index.html
+      #     fi
+      #     gcloud storage cp gcp-bck/index.html gs://$BUILD_PROJECT-web/
 
       - name: Setup access to the Function
         env:
@@ -89,9 +89,9 @@ jobs:
           BUILD_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: |
           gcloud functions add-iam-policy-binding $BUILD_PROJECT \
-            --region {{ secrets.GCP_REGION }} \
-            --member "user:szabolcs.hajdara@gmail.com" \
-            --role "roles/cloudfunctions.invoker"
+            --region=${{ secrets.GCP_REGION }} \
+            --member="user:szabolcs.hajdara@gmail.com" \
+            --role="roles/cloudfunctions.invoker"
           gcloud functions add-invoker-policy-binding $BUILD_PROJECT \
-            --region {{ secrets.GCP_REGION }} \
-            --member "user:szabolcs.hajdara@gmail.com"
+            --region=${{ secrets.GCP_REGION }} \
+            --member="user:szabolcs.hajdara@gmail.com"
