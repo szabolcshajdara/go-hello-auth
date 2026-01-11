@@ -89,9 +89,9 @@ jobs:
           BUILD_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: |
           gcloud functions add-iam-policy-binding $BUILD_PROJECT \
-            --region {{ secrets.GCP_REGION}} \
+            --region {{ secrets.GCP_REGION }} \
             --member "user:szabolcs.hajdara@gmail.com" \
             --role "roles/cloudfunctions.invoker"
           gcloud functions add-invoker-policy-binding $BUILD_PROJECT \
-            --region {{ secrets.GCP_REGION}} \
+            --region {{ secrets.GCP_REGION }} \
             --member "user:szabolcs.hajdara@gmail.com"
